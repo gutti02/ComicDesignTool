@@ -4,9 +4,36 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ComicDesignTool"
+        xml:lang="jp-JP"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="40"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="0"  Orientation="Vertical">
+            <Button x:Name="Button_PlotMode" Content="プロットモード" MinWidth="70" Click="Button_PlotMode_Click" IsEnabled="False">
+                <Button.LayoutTransform>
+                    <RotateTransform Angle="-90"/>
+                </Button.LayoutTransform>
+            </Button>
+            <Button x:Name="Button_ConteMode" Content="コンテモード" MinWidth="70" Click="Button_ConteMode_Click">
+                <Button.LayoutTransform>
+                    <RotateTransform Angle="-90"/>
+                </Button.LayoutTransform>
+            </Button>
+            <Button x:Name="Button_NameMode" Content="ネームモード" MinWidth="70" Click="Button_NameMode_Click">
+                <Button.LayoutTransform>
+                    <RotateTransform Angle="-90"/>
+                </Button.LayoutTransform>
+            </Button>
+            <Button x:Name="Button_PageView" Content="ページビュー" MinWidth="70" Click="Button_PageView_Click" IsEnabled="False">
+                <Button.LayoutTransform>
+                    <RotateTransform Angle="-90"/>
+                </Button.LayoutTransform>
+            </Button>
+        </StackPanel>
+        <Frame x:Name="Frame_Main" Grid.Column="1" NavigationUIVisibility="Hidden"/>
     </Grid>
 </Window>
