@@ -7,9 +7,14 @@ namespace ComicDesignTool
     /// </summary>
     public partial class NameMode:Page
     {
-        public NameMode()
+        //-----------------------------------------------------------------------------------------
+        private MainWindow mMainWindow = null;
+        //-----------------------------------------------------------------------------------------
+        public NameMode( MainWindow main_window )
         {
+            mMainWindow = main_window;
             InitializeComponent();
         }
+        //-----------------------------------------------------------------------------------------
     }
 }

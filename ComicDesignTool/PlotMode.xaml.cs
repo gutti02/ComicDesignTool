@@ -7,9 +7,15 @@ namespace ComicDesignTool
     /// </summary>
     public partial class PlotMode:Page
     {
-        public PlotMode()
+        //-----------------------------------------------------------------------------------------
+        private MainWindow mMainWindow = null;
+        //-----------------------------------------------------------------------------------------
+        public PlotMode( MainWindow main_window )
         {
+            mMainWindow = main_window;
+
             InitializeComponent();
         }
+        //-----------------------------------------------------------------------------------------
     }
 }

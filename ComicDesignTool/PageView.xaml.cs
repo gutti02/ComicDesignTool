@@ -7,9 +7,15 @@ namespace ComicDesignTool
     /// </summary>
     public partial class PageView:Page
     {
-        public PageView()
+        //-----------------------------------------------------------------------------------------
+        private MainWindow mMainWindow = null;
+        //-----------------------------------------------------------------------------------------
+        public PageView( MainWindow main_window )
         {
+            mMainWindow = main_window;
+
             InitializeComponent();
         }
+        //-----------------------------------------------------------------------------------------
     }
 }
