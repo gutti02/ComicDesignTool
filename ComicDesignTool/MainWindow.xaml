@@ -13,7 +13,7 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Column="0"  Orientation="Vertical">
-            <Button x:Name="Button_PlotMode" Content="プロットモード" MinWidth="70" Click="Button_PlotMode_Click" IsEnabled="False">
+            <Button x:Name="Button_PlotMode" Content="プロットモード" MinWidth="70" Click="Button_PlotMode_Click">
                 <Button.LayoutTransform>
                     <RotateTransform Angle="-90"/>
                 </Button.LayoutTransform>
@@ -28,7 +28,7 @@
                     <RotateTransform Angle="-90"/>
                 </Button.LayoutTransform>
             </Button>
-            <Button x:Name="Button_PageView" Content="ページビュー" MinWidth="70" Click="Button_PageView_Click" IsEnabled="False">
+            <Button x:Name="Button_PageView" Content="ページビュー" MinWidth="70" Click="Button_PageView_Click">
                 <Button.LayoutTransform>
                     <RotateTransform Angle="-90"/>
                 </Button.LayoutTransform>

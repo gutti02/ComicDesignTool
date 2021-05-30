@@ -9,12 +9,28 @@ namespace ComicDesignTool
     public partial class MainWindow:Window
     {
         //-----------------------------------------------------------------------------------------
+        public class ConteInfoList: Dictionary<string, List<int>>
+        {
+            public bool Remove( string key, int index )
+            {
+                var result = false;
+
+                result = this[key].Remove( index );
+                if( this[key].Count == 0 )
+                {
+                    result = this.Remove( key );
+                }
+
+                return result;
+            }
+        }
+        //-----------------------------------------------------------------------------------------
         private const string cIndifineStr = "Indifine";
         //-----------------------------------------------------------------------------------------
-        private Dictionary<string, List<int>> mThemeList = null;             // テーマ
-        private Dictionary<string, List<int>> mContentOutLineList = null;    // 話の大まかな流れ（起承転結）
-        private Dictionary<string, List<int>> mSequenceList = null;          // シーケンス
-        private Dictionary<string, List<int>> mSceneList = null;             // シーン
+        private ConteInfoList mThemeList = null;             // テーマ
+        private ConteInfoList mContentOutLineList = null;    // 話の大まかな流れ（起承転結）
+        private ConteInfoList mSequenceList = null;          // シーケンス
+        private ConteInfoList mSceneList = null;             // シーン
         private List<Cut> mCutList = null;                  // カット
 
         private PlotMode mPlotMode = null;
@@ -22,10 +38,10 @@ namespace ComicDesignTool
         private NameMode mNameMode = null;
         private PageView mPageView = null;
         //-----------------------------------------------------------------------------------------
-        public Dictionary<string, List<int>> ThemeList { get { return mThemeList; } }
-        public Dictionary<string, List<int>> ContentOutLineList { get { return mContentOutLineList; } }
-        public Dictionary<string, List<int>> SequenceList { get { return mSequenceList; } }
-        public Dictionary<string, List<int>> SceneList { get { return mSceneList; } }
+        public ConteInfoList ThemeList { get { return mThemeList; } }
+        public ConteInfoList ContentOutLineList { get { return mContentOutLineList; } }
+        public ConteInfoList SequenceList { get { return mSequenceList; } }
+        public ConteInfoList SceneList { get { return mSceneList; } }
         public List<Cut> CutList { get { return mCutList; } }
         //-----------------------------------------------------------------------------------------
         public MainWindow()
@@ -39,13 +55,13 @@ namespace ComicDesignTool
         /// </summary>
         private void init_()
         {
-            mThemeList = new Dictionary<string, List<int>>();
+            mThemeList = new ConteInfoList();
             mThemeList.Add( cIndifineStr, new List<int>() );
-            mContentOutLineList = new Dictionary<string, List<int>>();
+            mContentOutLineList = new ConteInfoList();
             mContentOutLineList.Add( cIndifineStr, new List<int>() );
-            mSequenceList = new Dictionary<string, List<int>>();
+            mSequenceList = new ConteInfoList();
             mSequenceList.Add( cIndifineStr, new List<int>() );
-            mSceneList = new Dictionary<string, List<int>>();
+            mSceneList = new ConteInfoList();
             mSceneList.Add( cIndifineStr, new List<int>() );
             mCutList = new List<Cut>();
 
@@ -123,7 +139,7 @@ namespace ComicDesignTool
             mCutList.Add( new_cut );
             var cut_list_index = mCutList.Count - 1;
 
-            System.Action<string, Dictionary<string, List<int>>> add_conte_list_info = ( key, list ) => {
+            System.Action<string, ConteInfoList> add_conte_list_info = ( key, list ) => {
                 if( string.IsNullOrEmpty( key ) || string.IsNullOrWhiteSpace( key ) )
                 {
                     list[cIndifineStr].Add( cut_list_index );
@@ -198,16 +214,12 @@ namespace ComicDesignTool
                 throw new System.Exception( "指定されたCutがｍCutListから見つからなかった。" );
             }
 
-            System.Func<string, Dictionary<string, List<int>>, string, bool> edit_content_list_info = ( new_key, list, prev_key ) =>
+            System.Func<string, ConteInfoList, string, bool> edit_content_list_info = ( new_key, list, prev_key ) =>
             {
                 // 新しいキーが指定されてなかったら特に何もしない
                 if( !string.IsNullOrEmpty( new_key ) && !string.IsNullOrWhiteSpace( new_key ) )
-                {   
-                    list[prev_key].Remove( cut_list_index );
-                    if( list[prev_key].Count == 0 )
-                    {
-                        list.Remove( prev_key );
-                    }
+                {
+                    list.Remove( prev_key, cut_list_index );
 
                     if( list.ContainsKey( new_key ) )
                     {
