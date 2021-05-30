@@ -70,7 +70,7 @@ namespace ComicDesignTool
                     if( !new_scene.IsOneceChanged )
                     {
                         new_scene.AddCut = mMainWindow.addCut( "", "", "", new_scene.Text );
-                        new_scene.OneceChange();
+                        new_scene.OnceChange();
                     }
                     // 再編集時は情報更新
                     else

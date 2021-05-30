@@ -16,7 +16,7 @@ namespace ComicDesignTool
         public bool IsOneceChanged { get { return mIsOnceChanged; } }
         public Cut AddCut { get { return mAddCut; } set { mAddCut = value; } }
         //-----------------------------------------------------------------------------------------
-        public void OneceChange()
+        public void OnceChange()
         {
             mIsOnceChanged = true;
         }
