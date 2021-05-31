@@ -9,7 +9,8 @@
         private string mSceneKey;             // シーン
 
         // コンテ用
-        private int mConteIndex;   // 何番目か
+        private int mConteIndex;        // 何番目か
+        private int mConteRange;    // コンテで使う列の長さ（最小1）
 
         // ネーム用
         private int mNamePage;     // 何ページ目か
@@ -26,6 +27,22 @@
 
         // コンテ用
         public int ConteIndex { get { return mConteIndex; } set { mConteIndex = value; } }    // 何番目か
+        public int ConteRange   // コンテで使う列の長さ（最小1）
+        {
+            get { return mConteRange; }
+            set
+            {
+                if( value < 1 )
+                {
+                    mConteRange = 1;
+                    System.Diagnostics.Debugger.Log( ( int )LogLevel.Warning, "Warning", "ConteRangeに1以下を設定しようしました。1を強制的に設定します。" );
+                }
+                else
+                {
+                    mConteRange = value;
+                }
+            }
+        }
 
         // ネーム用
         public int NamePage { get { return mNamePage; } set { mNamePage = value; } }      // 何ページ目か
@@ -43,6 +60,7 @@
             mSceneKey = "";
 
             mConteIndex = -1;
+            mConteRange = 1;
 
             mNamePage = -1;
             mNameIndex = -1;

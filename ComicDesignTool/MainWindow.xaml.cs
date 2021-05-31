@@ -3,34 +3,46 @@ using System.Windows;
 
 namespace ComicDesignTool
 {
+    public enum LogLevel
+    {
+        Log = 0,
+        Warning = 1,
+        Error = 2
+    };
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow:Window
     {
         //-----------------------------------------------------------------------------------------
-        public class ConteInfoList: Dictionary<string, List<int>>
+        public class EditiongCutArg
         {
-            public bool Remove( string key, int index )
-            {
-                var result = false;
+            public string mThemeKey = "";
+            public string mThemeOutLine = "";
 
-                result = this[key].Remove( index );
-                if( this[key].Count == 0 )
-                {
-                    result = this.Remove( key );
-                }
+            public string mContentOutLineKey = "";
+            public string mContentOutLineOutLine = "";
 
-                return result;
-            }
+            public string mSequenceKey = "";
+            public string mSequenceOutLine = "";
+
+            public string mSceneKey = "";
+            public string mSceneOutLine = "";
+
+            public int? mConteIndex;
+            public int? mConteRange;
+
+            public int? mNamePage;
+            public int? mNameIndex;
         }
         //-----------------------------------------------------------------------------------------
         private const string cIndifineStr = "Indifine";
         //-----------------------------------------------------------------------------------------
-        private ConteInfoList mThemeList = null;             // テーマ
-        private ConteInfoList mContentOutLineList = null;    // 話の大まかな流れ（起承転結）
-        private ConteInfoList mSequenceList = null;          // シーケンス
-        private ConteInfoList mSceneList = null;             // シーン
+        private IdeaInfoList mThemeList = null;             // テーマ
+        private IdeaInfoList mContentOutLineList = null;    // 話の大まかな流れ（起承転結）
+        private IdeaInfoList mSequenceList = null;          // シーケンス
+        private IdeaInfoList mSceneList = null;             // シーン
         private List<Cut> mCutList = null;                  // カット
 
         private PlotMode mPlotMode = null;
@@ -38,10 +50,10 @@ namespace ComicDesignTool
         private NameMode mNameMode = null;
         private PageView mPageView = null;
         //-----------------------------------------------------------------------------------------
-        public ConteInfoList ThemeList { get { return mThemeList; } }
-        public ConteInfoList ContentOutLineList { get { return mContentOutLineList; } }
-        public ConteInfoList SequenceList { get { return mSequenceList; } }
-        public ConteInfoList SceneList { get { return mSceneList; } }
+        public IdeaInfoList ThemeList { get { return mThemeList; } }
+        public IdeaInfoList ContentOutLineList { get { return mContentOutLineList; } }
+        public IdeaInfoList SequenceList { get { return mSequenceList; } }
+        public IdeaInfoList SceneList { get { return mSceneList; } }
         public List<Cut> CutList { get { return mCutList; } }
         //-----------------------------------------------------------------------------------------
         public MainWindow()
@@ -55,14 +67,14 @@ namespace ComicDesignTool
         /// </summary>
         private void init_()
         {
-            mThemeList = new ConteInfoList();
-            mThemeList.Add( cIndifineStr, new List<int>() );
-            mContentOutLineList = new ConteInfoList();
-            mContentOutLineList.Add( cIndifineStr, new List<int>() );
-            mSequenceList = new ConteInfoList();
-            mSequenceList.Add( cIndifineStr, new List<int>() );
-            mSceneList = new ConteInfoList();
-            mSceneList.Add( cIndifineStr, new List<int>() );
+            mThemeList = new IdeaInfoList();
+            mThemeList.Add( cIndifineStr, new IdeaInfo() );
+            mContentOutLineList = new IdeaInfoList();
+            mContentOutLineList.Add( cIndifineStr, new IdeaInfo() );
+            mSequenceList = new IdeaInfoList();
+            mSequenceList.Add( cIndifineStr, new IdeaInfo() );
+            mSceneList = new IdeaInfoList();
+            mSceneList.Add( cIndifineStr, new IdeaInfo() );
             mCutList = new List<Cut>();
 
             mPlotMode = new PlotMode( this );
@@ -74,7 +86,7 @@ namespace ComicDesignTool
             {
                 throw new System.NullReferenceException( "mConteModeがNull" );
             }
-            Frame_Main.Navigate( mConteMode );
+            Frame_Main.Navigate( mPlotMode );
         }
         //-----------------------------------------------------------------------------------------
         private void Button_PlotMode_Click( object sender, RoutedEventArgs e )
@@ -117,96 +129,79 @@ namespace ComicDesignTool
         /// カットの追加。
         /// ThemeやSceneなどないものが指定されていたら新しく追加してカットを追加する。
         /// </summary>
-        /// <param name="theme_key"></param>
-        /// <param name="content_outline_key"></param>
-        /// <param name="sequence_key"></param>
-        /// <param name="scene_key"></param>
-        /// <param name="conte_index"></param>
-        /// <param name="name_page"></param>
-        /// <param name="name_page_index"></param>
-        /// <returns>追加したCut</returns>
-        public Cut addCut( 
-            string theme_key = "",
-            string content_outline_key = "",
-            string sequence_key = "",
-            string scene_key = "",
-            int conte_index = -1,
-            int name_page = -1,
-            int name_page_index = -1
-        )
+        /// <param name="arg"></param>
+        /// <returns>追加したカット</returns>
+        public Cut addCut( EditiongCutArg arg )
         {
-            var new_cut = new Cut();
+            var new_cut = new Cut()
+            {
+                ConteIndex = arg.mConteIndex ?? -1,
+                ConteRange = arg.mConteRange ?? 1,
+                NamePage = arg.mNamePage ?? -1 ,
+                NameIndex = arg.mNameIndex ?? -1
+            };
             mCutList.Add( new_cut );
             var cut_list_index = mCutList.Count - 1;
 
-            System.Action<string, ConteInfoList> add_conte_list_info = ( key, list ) => {
+            System.Action<string, IdeaInfoList> add_conte_list_info = ( key, list ) => {
                 if( string.IsNullOrEmpty( key ) || string.IsNullOrWhiteSpace( key ) )
                 {
-                    list[cIndifineStr].Add( cut_list_index );
+                    list[cIndifineStr].AffiliationCutList.Add( cut_list_index );
                 }
                 else if( !list.ContainsKey( key ) )
                 {
-                    var cut_list = new List<int>();
-                    cut_list.Add( cut_list_index ); // 一番最後の要素が追加したカット
+                    var cut_list = new IdeaInfo();
+                    cut_list.AffiliationCutList.Add( cut_list_index ); // 一番最後の要素が追加したカット
                     list.Add( key, cut_list );
                 }
                 else
                 {
-                    list[key].Add( cut_list_index );
+                    list[key].AffiliationCutList.Add( cut_list_index );
                 }
             };
 
-            add_conte_list_info( theme_key, mThemeList );
-            add_conte_list_info( content_outline_key, mContentOutLineList );
-            add_conte_list_info( sequence_key, mSequenceList );
-            add_conte_list_info( scene_key, mSceneList );
+            add_conte_list_info( arg.mThemeKey, mThemeList );
+            add_conte_list_info( arg.mContentOutLineKey, mContentOutLineList );
+            add_conte_list_info( arg.mSequenceKey, mSequenceList );
+            add_conte_list_info( arg.mSceneKey, mSceneList );
 
-            if( string.IsNullOrEmpty( theme_key ) || string.IsNullOrWhiteSpace( theme_key ) )
+            if( string.IsNullOrEmpty( arg.mThemeKey ) || string.IsNullOrWhiteSpace( arg.mThemeKey ) )
             {
                 new_cut.ThemeKey = cIndifineStr;
             }
             else
             {
-                new_cut.ThemeKey = theme_key;
+                new_cut.ThemeKey = arg.mThemeKey;
             }
-            if( string.IsNullOrEmpty( content_outline_key ) || string.IsNullOrWhiteSpace( content_outline_key ) )
+            if( string.IsNullOrEmpty( arg.mContentOutLineKey ) || string.IsNullOrWhiteSpace( arg.mContentOutLineKey ) )
             {
                 new_cut.ContentOutLineKey = cIndifineStr;
             }
             else
             {
-                new_cut.ContentOutLineKey = content_outline_key;
+                new_cut.ContentOutLineKey = arg.mContentOutLineKey;
             }
-            if( string.IsNullOrEmpty( sequence_key ) || string.IsNullOrWhiteSpace( sequence_key ) )
+            if( string.IsNullOrEmpty( arg.mSequenceKey ) || string.IsNullOrWhiteSpace( arg.mSequenceKey ) )
             {
                 new_cut.SequenceKey = cIndifineStr;
             }
             else
             {
-                new_cut.SequenceKey = sequence_key;
+                new_cut.SequenceKey = arg.mSequenceKey;
             }
-            if( string.IsNullOrEmpty( scene_key ) || string.IsNullOrWhiteSpace( scene_key ) )
+            if( string.IsNullOrEmpty( arg.mSceneKey ) || string.IsNullOrWhiteSpace( arg.mSceneKey ) )
             {
                 new_cut.SceneKey = cIndifineStr;
             }
             else
             {
-                new_cut.SceneKey = scene_key;
+                new_cut.SceneKey = arg.mSceneKey;
             }
 
             return new_cut;
         }
         //-----------------------------------------------------------------------------------------
-        public void editCut(
-            Cut cut,
-            string new_theme_key = "",
-            string new_content_outline_key = "",
-            string new_sequence_key = "",
-            string new_scene_key = "",
-            int new_conte_index = -1,
-            int new_name_page = -1,
-            int new_name_index = -1
-        )
+        public void editCut( Cut cut, EditiongCutArg arg )
         {
             var cut_list_index = mCutList.IndexOf( cut );
             if( cut_list_index < 0 )
@@ -214,7 +209,7 @@ namespace ComicDesignTool
                 throw new System.Exception( "指定されたCutがｍCutListから見つからなかった。" );
             }
 
-            System.Func<string, ConteInfoList, string, bool> edit_content_list_info = ( new_key, list, prev_key ) =>
+            System.Func<string, IdeaInfoList, string, bool> edit_content_list_info = ( new_key, list, prev_key ) =>
             {
                 // 新しいキーが指定されてなかったら特に何もしない
                 if( !string.IsNullOrEmpty( new_key ) && !string.IsNullOrWhiteSpace( new_key ) )
@@ -223,12 +218,12 @@ namespace ComicDesignTool
 
                     if( list.ContainsKey( new_key ) )
                     {
-                        list[new_key].Add( cut_list_index );
+                        list[new_key].AffiliationCutList.Add( cut_list_index );
                     }
                     else
                     {
-                        var new_list = new List<int>();
-                        new_list.Add( cut_list_index );
+                        var new_list = new IdeaInfo();
+                        new_list.AffiliationCutList.Add( cut_list_index );
                         list.Add( new_key, new_list );
                     }
                     return true;
@@ -237,46 +232,41 @@ namespace ComicDesignTool
                 return false;
             };
 
-            if( edit_content_list_info( new_theme_key, mThemeList, cut.ThemeKey ) )
+            if( edit_content_list_info( arg.mThemeKey, mThemeList, cut.ThemeKey ) )
             {
-                cut.ThemeKey = new_theme_key;
+                cut.ThemeKey = arg.mThemeKey;
             }
-            if( edit_content_list_info( new_content_outline_key, mContentOutLineList, cut.ContentOutLineKey ) )
+            if( edit_content_list_info( arg.mContentOutLineKey, mContentOutLineList, cut.ContentOutLineKey ) )
             {
-                cut.ContentOutLineKey = new_content_outline_key;
+                cut.ContentOutLineKey = arg.mContentOutLineKey;
             }
-            if( edit_content_list_info( new_sequence_key, mSequenceList, cut.SequenceKey ) )
+            if( edit_content_list_info( arg.mSequenceKey, mSequenceList, cut.SequenceKey ) )
             {
-                cut.SequenceKey = new_sequence_key;
+                cut.SequenceKey = arg.mSequenceKey;
             }
-            if( edit_content_list_info( new_scene_key, mSceneList, cut.SceneKey ) )
+            if( edit_content_list_info( arg.mSceneKey, mSceneList, cut.SceneKey ) )
             {
-                cut.SceneKey = new_scene_key;
+                cut.SceneKey = arg.mSceneKey;
             }
 
-            if( 0 <= new_conte_index )
+            if( arg.mConteIndex.HasValue )
             {
-                cut.ConteIndex = new_conte_index;
+                cut.ConteIndex = arg.mConteIndex.Value;
             }
-            if( 0 <= new_name_page )
+            if( arg.mConteRange.HasValue )
             {
-                cut.NamePage = new_name_page;
+                cut.ConteRange = arg.mConteRange.Value;
             }
-            if( 0 <= new_name_index )
+            if( arg.mNamePage.HasValue )
             {
-                cut.NameIndex = new_name_index;
+                cut.NamePage = arg.mNamePage.Value;
+            }
+            if( arg.mNameIndex.HasValue )
+            {
+                cut.NameIndex = arg.mNameIndex.Value;
             }
         }
-        public void editCut(
-            int cut_index,
-            string new_theme_key = "",
-            string new_content_outline_key = "",
-            string new_sequence_key = "",
-            string new_scene_key = "",
-            int new_conte_index = -1,
-            int new_name_page = -1,
-            int new_name_index = -1
-        )
+        public void editCut( int cut_index, EditiongCutArg arg )
         {
             if( cut_index < 0 || mCutList.Count <= cut_index )
             {
@@ -284,7 +274,7 @@ namespace ComicDesignTool
             }
 
             var cut = mCutList[cut_index];
-            editCut( cut, new_theme_key, new_content_outline_key, new_sequence_key, new_scene_key, new_conte_index, new_name_page, new_name_index );
+            editCut( cut, arg );
         }
         //-----------------------------------------------------------------------------------------
     }

@@ -69,7 +69,12 @@ namespace ComicDesignTool
                     // 初回編集（つまり新規追加時）のみ新しいカットとして登録する
                     if( !new_scene.IsOneceChanged )
                     {
-                        new_scene.AddCut = mMainWindow.addCut( "", "", "", new_scene.Text );
+                        var add_cut_arg = new MainWindow.EditiongCutArg()
+                        {
+                            mSceneKey = new_scene.Text
+                        };
+
+                        new_scene.AddCut = mMainWindow.addCut( add_cut_arg );
                         new_scene.OnceChange();
                     }
                     // 再編集時は情報更新
@@ -79,8 +84,11 @@ namespace ComicDesignTool
                         {
                             throw new System.NullReferenceException( "CutがNullでした。Cutの追加に失敗してる？" );
                         }
-
-                        mMainWindow.editCut( new_scene.AddCut, "", "", "", new_scene.Text );
+                        var edit_cut_arg = new MainWindow.EditiongCutArg()
+                        {
+                            mSceneKey = new_scene.Text
+                        };
+                        mMainWindow.editCut( new_scene.AddCut, edit_cut_arg );
                     }
                 };
 
